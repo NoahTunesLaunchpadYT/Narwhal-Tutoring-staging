@@ -1,0 +1,39 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+
+{% block body %}
+<section id="login">
+    {% if message %}
+        <div class="alert alert-warning" role="alert">{{ message }}</div>
+    {% endif %}
+    <h2>Tutor Register</h2>
+    <form action="{% url 'tutor_register' %}?next={{ request.GET.next }}" method="post">
+        {% csrf_token %}
+        <div class="form-group">
+            <label for="username">Username</label>
+            <input class="form-control" autofocus type="text" name="username" id="username" placeholder="Username">
+        </div>
+        <div class="form-group">
+            <label for="email">Email Address</label>
+            <input class="form-control" type="email" name="email" id="email" placeholder="Email Address">
+        </div>
+        <div class="form-group">
+            <label for="mobile">Mobile Phone Number</label>
+            <input class="form-control" type="tel" name="mobile" id="mobile" pattern="[0-9]{10}" placeholder="e.g., 0455555555" required>
+        </div>
+        <div class="form-group">
+            <label for="password">Password</label>
+            <input class="form-control" type="password" name="password" id="password" placeholder="Password">
+        </div>
+        <div class="form-group">
+            <label for="confirmation">Confirm Password</label>
+            <input class="form-control" type="password" name="confirmation" id="confirmation" placeholder="Confirm Password">
+        </div>
+        <!-- End of new fields with labels -->
+        <input class="btn btn-primary" type="submit" value="Register">
+    </form>
+    Already have an account? <a href="{% url 'login' %}?next={{ request.GET.next }}">Log In here.</a>
+</section>
+
+
+
+{% endblock %}

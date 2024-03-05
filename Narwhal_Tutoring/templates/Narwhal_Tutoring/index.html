@@ -1,0 +1,140 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <section id="hero">
+        <div id="hero-text">
+            <div class="alert alert-success" role="alert">
+                LIMITED TIME OFFER: TRIAL YOUR FIRST LESSON FOR FREE!
+            </div>
+            <h1>Private Tutoring in Perth</h1>
+            <h4>Home and online 1-on-1 lessons from ~99 ATAR tutors.</h4>
+            <p>Find a tutor now!</p>
+            <div>
+                <a href="{% url 'tutors' %}">
+                    <button type="button" class="btn btn-primary">Find a Tutor</button>
+                </a>
+                <a href="{% url 'about' %}">
+                    <button type="button" class="btn btn-secondary">About Us</button>
+                </a>
+            </div>
+        </div>
+    </section>
+    <section id="feature" class="section-p1">
+        <div class="fe-box">
+            <i class="bi bi-house" style="font-size: 4rem;"></i>
+            <h4>Home Tutoring</h4>
+            <p>
+                One-on-one lessons occur in the comfort of your own home (or online).
+            </p>
+        </div>
+        <div class="fe-box">
+            <i class="bi bi-star" style="font-size: 4rem;"></i>
+            <h4>99+ ATAR</h4>
+            <p>
+                Our tutors are recent graduates, averaging over 99.0 ATAR.
+            </p>
+        </div>
+        <div class="fe-box">
+            <i class="bi bi-book" style="font-size: 4rem;"></i>
+            <h4>Resources</h4>
+            <p>
+                Develop your understanding with textbooks, practice papers, and past exams.
+            </p>
+        </div>
+        <div class="fe-box">
+            <i class="bi bi-coin" style="font-size: 4rem;"></i>
+            <h4>Risk free</h4>
+            <p>
+                No lock-in contracts, flexible cancellation policy, and 7 day customer support.
+            </p>
+        </div>
+    </section>
+
+    <section id="steps" class="section-p1">
+        <h2>How to Book a Lesson</h2>
+        <div class="step-box">
+            <h3>1.</h3>
+            <h4>Find a tutor.</h4>
+            <p>
+                <a href="{% url 'tutors' %}">Find an available tutor</a> in a nearby suburb that tutors the subjects you need.
+            </p>
+        </div>
+        <div class="step-box">
+            <h3>2.</h3>
+            <h4>Book your lessons.</h4>
+            <p>
+                Find a timeslot in the tutor's schedule where weekly lessons can take place and select your starting date. 
+            </p>
+        </div>
+        <div class="step-box">
+            <h3>3.</h3>
+            <h4>Pay.</h4>
+            <p>
+                Pay for your lessons to confirm the booking. 
+            </p>
+        </div>
+        <div class="step-box">
+            <h3>4.</h3>
+            <h4>Contact your tutor.</h4>
+            <p>
+                After paying, reach out to your tutor to confirm the time and day of your first lesson, and ask any questions you may have about the lessons. 
+            </p>
+        </div>
+    </section>
+
+    <section id="featured-tutors" class="section-p1">
+        <h1 class="center-title">Featured Tutors</h1>
+        <div id="tutor-grid">
+            {% for tutor in tutors %}
+                {% if tutor.details.all.0.available %}
+                    <div class="tutor">
+                        <img class="pfp-large" src="{% static 'images/' %}{{ tutor.details.all.0.pfp_url }}" alt="{{ tutor.username }}'s Image">
+                        <div class="tutor-info">
+                            <h4 class="tutor-name">{{ tutor.username }}</h4>
+                            <ul>
+                                <li>
+                                    Atar: {{ tutor.details.all.0.atar }}
+                                </li>
+                                <li>
+                                    Suburb: {{ tutor.details.all.0.suburb }}
+                                </li>
+                                <li>
+                                    Subjects: 
+                                    {% for subject in tutor.details.all.0.subjects.all %}
+                                        {{ subject.type }} {{ subject.name }},
+                                    {% endfor %}
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="d-flex justify-content-center">
+                            <a href="{% url 'tutor' tutor_id=tutor.id %}">
+                                <button type="button" class="btn btn-primary">View Page</button>
+                            </a>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+    </section>
+
+    <section id="call-to-action">
+        <div class="dark">
+            <h3>
+                Want to know more?
+            </h3>
+            <a href="{% url 'about' %}">
+                <button type="button" class="btn btn-secondary">About Us</button>
+            </a>
+        </div>
+        <div class="dark">
+            <h3>
+                Have any questions?
+            </h3>
+            <a href="{% url 'contact' %}">
+                <button type="button" class="btn btn-secondary">Contact Us</button>
+            </a>
+        </div>
+    </section>
+
+{% endblock %}

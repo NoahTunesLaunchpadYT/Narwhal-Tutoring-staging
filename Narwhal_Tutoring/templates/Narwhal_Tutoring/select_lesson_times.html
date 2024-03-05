@@ -1,0 +1,127 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <a class="navbar-brand" href="{% url 'index'%}"><img src="{% static 'images/text_logo.png' %}" alt="Example Image" class="logo"></a>
+    <section class="section-p1">
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <h1 class="center-title">
+            Select Lesson Times
+        </h1>
+        <a href="{% url 'tutor' tutor_id=tutor.id %}">
+            <button type="button" class="btn btn-secondary">{{ tutor }}'s Profile</button>
+        </a>
+    </section>
+    <section class="contacts">
+        <div class="calendar-container">
+            <h3>Drag click on the green areas to select lesson times.</h3>
+            {% if user.is_authenticated %}
+            {% else %}
+                <h4>You are not currently logged in.
+                    <a href="{% url 'login' %}?next={{ request.path }}">Log In</a>
+                    or
+                    <a href="{% url 'register' %}?next={{ request.path }}">Register</a>
+                    to book your lesson.
+                </h4>
+                    
+            {% endif %}
+
+            {% if tutor.details.all.0.available %}
+                <div class='calendar' id='calendar'></div>
+                <div class="booking-info">
+                    {% if user.is_authenticated %}
+                        <div id="cost-button-div">
+                            <form id="checkout-form" method="POST">
+                                {% csrf_token %}
+                                <button type="submit" id="checkout-button" class="btn btn-primary">Checkout</button>
+                            </form>
+                            <div id="cost-div"></div>
+                        </div>
+                        <div>
+                            <div id="times-booked">
+                                You have not selected a time yet. <b>Click and drag on a green area to select a time. </b>
+                            </div>
+                            <ul>
+                                <li>After booking you will have access to {{ tutor }}'s number.</li>
+                                <li>If either party can not make the lesson, a make up lesson will be schedualed.</li>
+                                <li>Bookings made less than a week in advance fall under our <a href="{% url 'tos' %}"></a>late booking policy</a>.</li>
+                                <li>Please read our <a href="{% url 'tos' %}">terms of service</a> for more info.</li>
+                            </ul>
+                            <p>Have any questions? We're always happy to provide answers at 0421286031.</p>
+                            {% if discount %}
+                                <div class="alert alert-success" role="alert">
+                                    Discount: $70
+                                </div>
+                            {% endif %}
+                            <br>
+                        </div>
+                    {% else %}
+                        <div>
+                            <h4>You are not currently logged in.
+                                <a href="{% url 'login' %}?next={{ request.path }}">Log In</a>
+                                or
+                                <a href="{% url 'register' %}?next={{ request.path }}">Register</a>
+                                to book your lesson.
+                            </h4>
+                        </div>
+                    {% endif %}
+                    <div>
+                        <h4>Pricing Structure: </h4>
+                        <div id="pricing-info">
+                            <div class="price-tag" id="hr-1">
+                                <h5>
+                                    Single Lesson
+                                </h5>
+                                <p>
+                                    Regular Rate: $70/hr
+                                </p>
+                            </div>
+                            <div class="price-tag" id="hr-2">
+                                <h5>
+                                    5-Hours Package
+                                </h5>
+                                <p>
+                                    Discount: 10%<br>
+                                    Price per Hour: $63/hr<br>
+                                    Total Package: $315
+                                </p>
+                            </div>
+                            <div class="price-tag" id="hr-3">
+                                <h5>
+                                    10-Hours Package
+                                </h5>
+                                <p>
+                                    Discount: 15%<br>
+                                    Price per Hour: $60/hr<br>
+                                    Total Package: $600
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            {% else %}
+                {{ tutor }} is <strong>unavailable</strong>.
+            {% endif %}
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    <script>
+        var csrfToken = "{{ csrf_token }}";
+        var tutorId = "{{ tutor.id }}";
+        var checkOutUrl = "{% url 'create-checkout-session' %}"
+        var username = "{{ user.username }}";
+    </script>
+    <script src="{% static 'javascript/tutor.js' %}"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}

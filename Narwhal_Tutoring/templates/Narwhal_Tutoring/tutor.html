@@ -1,0 +1,93 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <a class="navbar-brand" href="{% url 'index'%}"><img src="{% static 'images/text_logo.png' %}" alt="Example Image" class="logo"></a>
+    <section class="section-p1">
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+            <div class="alert alert-success" role="alert">
+                LIMITED TIME OFFER: TRIAL YOUR FIRST LESSON FOR FREE!
+            </div>
+        </div>
+        {% endif %}
+        <h1 class="center-title">
+            Book lesson with {{ tutor.username }}
+        </h1>
+    </section>
+    <section class="contacts">
+        <div class="full-profile">
+            <img src="{% static 'images/' %}{{ tutor.details.all.0.pfp_url }}" alt="{{ tutor }}">
+            <div class="text-box">
+                <h3>{{ tutor }}</h3>
+                <p>
+                    <b>ATAR:</b> {{ tutor.details.all.0.atar }} <br>
+                    <b>Suburb:</b> {{ tutor.details.all.0.suburb }} <br>
+                    <b>Subjects:</b> 
+                    {% for subject in tutor.details.all.0.subjects.all %}
+                        {{ subject.type }} {{ subject.name }},
+                    {% endfor %} <br>
+                    {% if tutor.details.all.0.university %}
+                        <b>University:</b> {{ tutor.details.all.0.university }}
+                    {% endif %} <br>
+                    <br><br>
+                    <i>
+                        "{{ tutor.details.all.0.description }}"
+                    </i>
+                </p>
+                <div id="center-button-div">
+                    <a href="{% url 'select_lesson_times' tutor_id=tutor.id %}">
+                        <button type="button" class="btn btn-primary">Select Lesson Times</button>
+                    </a>
+                </div>
+            </div>
+            <div id="pricing-info">
+                <div class="price-tag" id="hr-1">
+                    <h5>
+                        Single Lesson
+                    </h5>
+                    <p>
+                        Regular Rate: $70/hr
+                    </p>
+                </div>
+                <div class="price-tag" id="hr-2">
+                    <h5>
+                        5-Hours Package
+                    </h5>
+                    <p>
+                        Discount: 10%<br>
+                        Price per Hour: $63/hr<br>
+                        Total Package: $315
+                    </p>
+                </div>
+                <div class="price-tag" id="hr-3">
+                    <h5>
+                        10-Hours Package
+                    </h5>
+                    <p>
+                        Discount: 15%<br>
+                        Price per Hour: $60/hr<br>
+                        Total Package: $600
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    <script>
+        var csrfToken = "{{ csrf_token }}";
+        var tutorId = "{{ tutor.id }}";
+        var checkOutUrl = "{% url 'create-checkout-session' %}"
+        var username = "{{ user.username }}";
+    </script>
+    <script src="{% static 'javascript/tutor.js' %}"></script>
+    <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+{% endblock %}

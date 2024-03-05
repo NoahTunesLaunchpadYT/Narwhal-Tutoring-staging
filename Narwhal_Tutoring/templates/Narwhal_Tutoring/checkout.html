@@ -1,0 +1,31 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <button id="checkout-button">Checkout</button>
+{% endblock %}
+
+{% block script %}
+    <script>
+        var stripe = Stripe('{{STRIPE_PUBLIC_KEY}}');  // Replace with your actual public key
+        var checkoutButton = document.getElementById('checkout-button');
+
+        checkoutButton.addEventListener('click', function () {
+            fetch('/create-checkout-session/', {
+                method: 'POST',
+            })
+            .then(response => response.json())
+            .then(session => {
+                return stripe.redirectToCheckout({ sessionId: session.id });
+            })
+            .then(result => {
+                if (result.error) {
+                    alert(result.error.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        });
+    </script>
+{% endblock %}

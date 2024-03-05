@@ -1,0 +1,47 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <a class="navbar-brand" href="{% url 'index'%}"><img src="{% static 'images/text_logo.png' %}" alt="Example Image" class="logo"></a>
+    <section class="success-contact">
+        {% if message %}
+        <div class="alert alert-success" role="alert">
+                {{ message }}
+        </div>
+        {% endif %}
+        <div id="success-textbox">
+            <h3>
+                Your tutor has been notified of your booking. Please confirm the location of the lesson with them.
+            </h3>
+            <p>Example: "Hi {{ tutor.username }}, I have made a booking for a lesson, are you alright to drive to our home for lessons?"</p>
+            <p>{{ tutor }}'s calendar has been updated with your bookings. <br>
+                You can view your bookings at your <a href="{% url 'dashboard' %}">dashboard.</a></p>
+        </div>
+        <div class="whatsapp-and-mobile-card">
+            <h4>Whatsapp (recommended): {{ tutor.details.all.0.mobile }}</h4>
+            <h4>Mobile: {{ tutor.details.all.0.mobile }}</h4>
+        </div>
+        <div class="full-profile">
+            <img src="{% static 'images/' %}{{ tutor.details.all.0.pfp_url }}" alt="{{ tutor }}">
+            <div class="text-box">
+                <h3>{{ tutor }}</h3>
+                <p>
+                    ATAR: {{ tutor.details.all.0.atar }} <br>
+                    Suburb: {{ tutor.details.all.0.suburb }} <br>
+                    Subjects: 
+                    {% for subject in tutor.details.all.0.subjects.all %}
+                        {{ subject.name }},
+                    {% endfor %} <br>
+                    {% if tutor.details.all.0.university %}
+                        {{ tutor.details.all.0.university }}
+                    {% endif %}
+                    Online or in person.
+                    <br>
+                    <i>
+                        "{{ tutor.details.all.0.description }}"
+                    </i>
+                </p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

@@ -1,0 +1,21 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+
+{% block body %}
+    <section id="login">
+        {% if message %}
+            <div class="alert alert-warning" role="alert">{{ message }}</div>
+        {% endif %}
+        <h2>Login</h2>
+        <form method="post" action="{% url 'login' %}?next={{ request.GET.next }}">
+            {% csrf_token %}
+            <div class="form-group">
+                <input autofocus class="form-control" type="text" name="username" placeholder="Username" autocomplete>
+            </div>
+            <div class="form-group">
+                <input class="form-control" type="password" name="password" placeholder="Password" autocomplete>
+            </div>
+            <input class="btn btn-primary" type="submit" value="Login">
+        </form>
+        Don't have an account? <a href="{% url 'register' %}?next={{ request.GET.next }}">Register here.</a>
+    </section>
+{% endblock %}

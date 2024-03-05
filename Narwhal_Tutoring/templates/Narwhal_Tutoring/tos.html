@@ -1,0 +1,53 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <a class="navbar-brand" href="{% url 'index'%}"><img src="{% static 'images/text_logo.png' %}" alt="Example Image" class="logo"></a>
+    <section class="section-p1 about-us">
+        <h1 class="center-title">
+            Narwhal Tutoring Terms of Service
+        </h1>
+        <div class="about-us-text">
+            <p>Thank you for choosing Narwhal Tutoring! Before you proceed, please review our Terms of Service carefully.</p>
+
+            <b>Late Booking Policy:</b>
+            <p>Clients must confirm tutor availability for lesson bookings made within a week of today.</p>
+
+            <b>Cancellation Policy:</b>
+            <ul>
+                <li><strong>Proper Notice (> 2 hours):</strong> Tutor and student should collaborate to find a suitable time for a make-up lesson.</li>
+                <li><strong>Late Notice:</strong> No make-up lesson owed.</li>
+            </ul>
+            <br>
+
+            <b>Booking Policy:</b>
+            <ul>
+                <li>Client books a lesson and makes payment.</li>
+                <li>Client contacts the tutor with the lesson location.</li>
+                <li>Tutor confirms availability for the session.</li>
+                <li>If the tutor cannot make the session, a reschedule or refund will be provided.</li>
+            </ul>
+            <br>
+
+            <b>Refund Policy:</b>
+            <p>For refund inquiries, please contact Noah West at 0421 286 031.</p>
+
+            <b>Travel Fees Policy:</b>
+            <ul>
+                <li>Tutors will drive to any location within 10km of their suburb unless otherwise specified in the tutor's description.</li>
+                <li>Additional travel fees may apply if the distance is challenging for the tutor.</li>
+            </ul>
+            <br>
+
+            <b>Multiple Students Policy:</b>
+            <p>For multiple students attending the same lesson, an extra $30 per hour will be added to the cost of the lesson per student.</p>
+
+            <p>By using our services, you agree to abide by these Terms of Service. Narwhal Tutoring reserves the right to update these terms as needed. Clients will be notified of any changes.</p>
+
+            <p>If you have any questions or concerns, please do not hesitate to reach out to us at <a href="mailto:your@email.com">your@email.com</a> or by phone at [your phone number].</p>
+
+            <p>Thank you for choosing Narwhal Tutoring!</p>
+        </div>
+    </section>
+{% endblock %} 
+    

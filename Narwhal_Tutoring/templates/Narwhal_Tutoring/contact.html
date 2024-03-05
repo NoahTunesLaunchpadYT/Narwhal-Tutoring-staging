@@ -1,0 +1,45 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+{% load static %}
+
+{% block body %}
+<a class="navbar-brand" href="{% url 'index'%}"><img src="{% static 'images/text_logo.png' %}" alt="Example Image" class="logo"></a>
+    <section class="section-p1">
+        <h1 class="center-title">
+            Contact Us
+        </h1>
+    </section>
+    <section class="contacts">
+        <div class="contact">
+            <img src="{% static 'images/Noah.png' %}" alt="Noah">
+            <div class="text-box">
+                <h3>Noah West</h3>
+                <h4>Director of Narwhal Tutoring</h4>
+                <ul>
+                    <li>Whatsapp: <a href="https://wa.link/osspof">wa.link/osspof</a> (recommended)</li>
+                    <li>Phone: <a href="tel:+61421286031">0421286031</li></a>
+                    <li>Email: <a href="mailto:narwhaltutoring@gmail.com">narwhaltutoring@gmail.com</a></li>
+                </ul>
+                <p>Parents and students, please contact me if you have any questions.</p>
+            </div>
+        </div>
+        <div class="contact">
+            <img src="{% static 'images/Vyom.png' %}" alt="Vyom">
+            <div class="text-box">
+                <h3>Vyom Patoliya</h3>
+                <h4>Director of Narwhal Tutoring</h4>
+                <ul>
+                    <li>Whatsapp: <a href="https://wa.link/2kwlev">wa.link/2kwlev</a></li>
+                    <li>Phone: <a href="tel:+61406089073">0406089073</li></a>
+                    <li>Email: <a href="mailto:narwhaltutoring@gmail.com">narwhaltutoring@gmail.com</a></li>
+                </ul>
+                <p>Contact me regarding becoming a Narwhal Tutor.</p>
+            </div>
+        </div>
+        <p>
+            For the contact details of your tutor. Book your first lesson.
+        </p>
+        <a href="{% url 'tutors' %}">
+            <button type="button" class="btn btn-secondary" aria-label="Tutors Buttons">Tutors</button>
+        </a>
+    </section>
+{% endblock %}

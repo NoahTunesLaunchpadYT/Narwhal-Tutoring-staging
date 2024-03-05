@@ -1,0 +1,211 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+{% load static %}
+
+{% block body %}
+<a class="navbar-brand" href="{% url 'index'%}"><img src="{% static 'images/text_logo.png' %}" alt="Example Image" class="logo"></a>
+    <section class="section-p1">
+        <h1 class="center-title">
+            Dashboard
+        </h1>
+        <div class="center-title">
+        {% if user.details.all.0.tutor %}
+            <!-- Button group for availability -->
+            <div class="btn-group mb-3" role="group" aria-label="Availability">
+                <button type="button" class="btn {% if user.details.all.0.available %}btn-primary{% else %}btn-secondary{% endif %}" id="btnAvailable">Available</button>
+                <button type="button" class="btn {% if not user.details.all.0.available %}btn-primary{% else %}btn-secondary{% endif %}" id="btnUnavailable">Unavailable</button>
+            </div>
+            <p>
+                (Only tutors who are "available" can gain new clients.)
+            </p>
+        {% endif %}
+        
+        </div>
+    </section>
+    <section id="dashboard-panel">
+        <div class="dashboard-nav">
+            <div class="col-12">
+                <div class="list-group" id="list-tab" role="tablist">
+                    <a class="list-group-item list-group-item-action active" id="list-profile-list" data-toggle="list" href="#list-profile" role="tab" aria-controls="profile">Profile</a>
+                    {% if user.details.all.0.tutor or user.username == "admin" %}
+                        <a class="list-group-item list-group-item-action" id="list-availabilities-list" data-toggle="list" href="#list-availabilities" role="tab" aria-controls="availabilities">My Availabilities</a>
+                    {% endif %}
+                    <a class="list-group-item list-group-item-action" id="list-calendar-list" data-toggle="list" href="#list-calendar" role="tab" aria-controls="calendar">Calendar</a>
+                    {% if user.details.all.0.tutor or user.username == "admin" %}
+                        <a class="list-group-item list-group-item-action" id="list-payslips-list" data-toggle="list" href="#list-payslips" role="tab" aria-controls="payslips">Payslips</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        {% if messages %}
+        <div class="container mt-3">
+            {% for message in messages %}
+            <div class="alert {% if message.tags %} alert-{{ message.tags }}{% endif %}" role="alert">
+                {{ message }}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+        <div class="dashboard-content">
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="list-profile" role="tabpanel" aria-labelledby="list-profile-list">
+                    <h3>Profile</h3>
+                    <form action="{% url 'dashboard' %}#list-profile" method="post">
+                        {% csrf_token %}
+
+                        <p>Hit the "Submit" button at the bottom to save changes</p>
+                    
+                        <!-- Username -->
+                        <div class="mb-3">
+                            <label for="username" class="form-label">Username</label>
+                            <input type="text" class="form-control" id="username" name="username" value="{{ user.username }}" required>
+                        </div>
+                        
+                        <!-- Email -->
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email*</label>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ user.email }}" required>
+                        </div>
+                    
+                        <!-- Mobile Number -->
+                        <div class="mb-3">
+                            <label for="mobile" class="form-label">Mobile</label>
+                            <input type="tel" class="form-control" id="mobile" name="mobile" pattern="[0-9]{10}" placeholder="e.g., 0455555555" value="{{ user.details.all.0.mobile }}" required>
+                            <small class="form-text text-muted">Please enter your mobile number (10 digits).</small>
+                        </div>
+
+                        {% if user.details.all.0.tutor %}
+                            <!-- ATAR -->
+                            <div class="mb-3">
+                                <label for="atar" class="form-label">ATAR</label>
+                                <input type="number" class="form-control" id="atar" name="atar" step="0.01" value="{{ user.details.all.0.atar }}" required>
+                            </div>
+                            
+                            <!-- Suburb -->
+                            <div class="mb-3">
+                                <label for="suburb" class="form-label">Suburb</label>
+                                <input type="text" class="form-control" id="suburb" name="suburb" value="{{ user.details.all.0.suburb }}" maxlength="127" required>
+                            </div>
+
+                            <!-- Subjects (Multiselect) -->
+                            <div class="form-group">
+                                <label>Subjects (check to select multiple)</label>
+                                {% for subject in subjects %}
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="subject_{{ subject.id }}" name="subjects" value="{{ subject.id }}" {% if subject in user.details.all.0.subjects.all %}checked{% endif %}>
+                                        <label class="form-check-label" for="subject_{{ subject.id }}">{{ subject.type }} {{ subject.name }}</label>
+                                    </div>
+                                {% endfor %}
+                            </div>  
+                            
+                            <!-- Description -->
+                            <div class="mb-3">
+                                <label for="description" class="form-label">Description</label>
+                                <textarea class="form-control" id="description" name="description" rows="5" maxlength="1000" required>{{ user.details.all.0.description }}</textarea>
+                            </div>
+                            
+                            <!-- University (Optional) -->
+                            <div class="mb-3">
+                                <label for="university" class="form-label">University (optional)</label>
+                                <input type="text" class="form-control" id="university" name="university" maxlength="255" value="{{ user.details.all.0.university }}">
+                            </div>
+                            
+                            <!-- Degree (Optional) -->
+                            <div class="mb-3">
+                                <label for="degree" class="form-label">Degree (optional)</label>
+                                <input type="text" class="form-control" id="degree" name="degree" maxlength="255" value="{{ user.details.all.0.degree }}">
+                            </div>
+                        {% else %}
+                            <!-- Address -->
+                            <div class="mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <input type="text" class="form-control" id="address" name="address" maxlength="255" value="{{ user.details.all.0.address }}">
+                            </div>
+
+                            <!-- Student 1 -->
+                            <div class="mb-3">
+                                <label for="student1_name" class="form-label">Student 1 name</label>
+                                <input type="text" class="form-control" id="student1_name" name="student1_name" maxlength="255" value="{{ user.details.all.0.student1_name }}">
+                            </div>
+
+                            <!-- Student 2 -->
+                            <div class="mb-3">
+                                <label for="student2_name" class="form-label">Student 2 name</label>
+                                <input type="text" class="form-control" id="student2_name" name="student2_name" maxlength="255" value="{{ user.details.all.0.student2_name }}">
+                            </div>
+
+                            <!-- Student 3 -->
+                            <div class="mb-3">
+                                <label for="student3_name" class="form-label">Student 3 name</label>
+                                <input type="text" class="form-control" id="student3_name" name="student3_name" maxlength="255" value="{{ user.details.all.0.student3_name }}">
+                            </div>
+                        {% endif %}
+                        
+                        <!-- Submit Button -->
+                        <button type="submit" class="btn btn-primary">Submit</button>
+                    </form>                                             
+                </div>
+                {% if user.details.all.0.tutor or user.username == "admin" %}
+                    <div class="tab-pane fade" id="list-availabilities" role="tabpanel" aria-labelledby="list-availabilities-list">
+                        <h3>Availabilities (Perth Timezone)</h3>
+                        <div class="calendar" id='availability-calendar'></div>
+                    </div>
+                    <div class="tab-pane fade" id="list-payslips" role="tabpanel" aria-labelledby="list-payslips-list">
+                        <h3>Payslips</h3>
+                        {% if payslips %}
+                            {% for payslip in payslips reversed %}
+                                <div class="payslip">
+                                    <b>{{ payslip.start_date }} - {{ payslip.end_date }}</b>
+                                    {% for tutor in payslip.tutors %}
+                                        {% if tutor.sessions %}
+                                            <h4>{{ tutor.tutor }}</h4>
+                                            <table class="table">
+                                                <thead>
+                                                    <tr>
+                                                        <th>Date</th>
+                                                        <th>Hours</th>
+                                                        <th>Client</th>
+                                                        <th>Tutor Payment</th>
+                                                    </tr>
+                                                </thead>
+                                                <tbody>
+                                                    {% for session in tutor.sessions %}
+                                                        <tr>
+                                                            <td>{{ session.date }}</td>
+                                                            <td>{{ session.time }}</td>
+                                                            <td>{{ session.client }}</td>
+                                                            <td>{{ session.hours }} hrs</td>
+                                                            <td>{{ session.tutor_payment }}</td>
+                                                        </tr>
+                                                    {% endfor %}
+                                                </tbody>
+                                            </table>
+                                            <div class="total-container">
+                                                <b>Total: {{ tutor.total }}</b>
+                                            </div>
+                                        {% endif %}
+                                    {% endfor %}
+                                </div>
+                            {% endfor %}
+                        {% endif %}
+                    </div>
+                {% endif %}
+                <div class="tab-pane fade" id="list-calendar" role="tabpanel" aria-labelledby="list-calendar-list">
+                    <h3>Calendar (Perth Timezone)</h3>
+                    <div class="calendar" id='calendar'></div>
+                    <div id="times-booked">
+                        You have no lessons booked.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+{% endblock %}
+
+{% block script %}
+    <script>
+        var tutorId = "{{ user.id }}";
+        var userTutor = "{{ user.details.all.0.tutor }}";
+        console.log(userTutor);
+    </script>
+    <script src="{% static 'javascript/dashboards.js' %}"></script>
+{% endblock %}

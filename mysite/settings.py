@@ -16,6 +16,9 @@ from pathlib import Path
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
+CSRF_TRUSTED_ORIGINS = ['https://narwhal.up.railway.app',
+                        'https://narwhal-tutoring-staging.up.railway.app']
+
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/4.0/howto/deployment/checklist/
@@ -41,6 +44,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'Narwhal_Tutoring',
 ]
 
 MIDDLEWARE = [
@@ -108,6 +112,8 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+#AUTH_USER_MODEL = 'Narwhal_Tutoring.User'
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.0/topics/i18n/
@@ -132,3 +138,12 @@ STATIC_ROOT = os.path.join(BASE_DIR, "staticfiles")
 # https://docs.djangoproject.com/en/4.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+#Stripe Stuff
+
+STRIPE_PUBLIC_KEY = "pk_live_51OYnzrKCFeavPzHiXRW7BKPuDOO2ofyXoZqmZ1ZRgi876NsnbwfB3CNpDeBO1JrOkf0X36PQgmgVC5uc6CT08rfO002lfYvOiF"
+STRIPE_SECRET_KEY = "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"
+
+#Twilio stuff
+TWILIO_ACCOUNT_SID = 'AC115c8c63c76f01ccb086edd2f0f40002'
+TWILIO_AUTH_TOKEN = '87b7735331bfcaefc0d43b2006f7ca59'

@@ -1,0 +1,39 @@
+{% extends "Narwhal_Tutoring/layout.html" %}
+{% load static %}
+
+{% block body %}
+    <a class="navbar-brand" href="{% url 'index'%}"><img src="{% static 'images/text_logo.png' %}" alt="Example Image" class="logo"></a>
+    <section class="section-p1 about-us">
+        <h1 class="center-title">
+            About Us
+        </h1>
+        <div class="about-us-text">
+            <p>
+                Welcome to Narwhal Tutoring, your premier tutoring service provider born out of Perth Modern School. We pride ourselves on bridging the educational journey between former high-achieving students and prospective learners.
+            </p>
+            <p>
+                Narwhal Tutoring is a locally operated business that capitalizes on our firsthand experiences as successful students. Our distinguished credentials speak volumes:
+            </p>
+            <p>
+                All our tutors hail from consistently high-performing schools.
+                An impressive 99+ average ATAR across our tutor team.
+                An outstanding 99.7 average ATAR achieved by our managing directors.
+                We offer a range of lessons conducted online, face-to-face throughout Perth, and we've recently expanded our reach to dedicated tutors in Adelaide and Sydney. Our key strength lies in flexibility, allowing tutors and students to collaboratively decide on the timing, location, and frequency of lessons.
+            </p>
+            <p>
+                At Narwhal Tutoring, we curate diverse learning materials, encompassing lesson templates, guides, and resource drives. We are committed to maintaining professional standards, reflected in the competitive wages we offer to our tutors. Our directors, Noah and Vyom, are always available for a conversation with anyone seeking assistance.
+            </p>
+            <p>
+                <a href="{% url 'tutors' %}">Book your first lesson today</a> to embark on an enriching learning experience.
+            </p>
+            <div>
+                <a href="{% url 'tutors' %}">
+                    <button type="button" class="btn btn-primary">Tutors</button>
+                </a>
+                <a href="{% url 'contact' %}">
+                    <button type="button" class="btn btn-primary">Contact Us</button>
+                </a>
+            </div>
+        </div>
+    </section>
+{% endblock %}
