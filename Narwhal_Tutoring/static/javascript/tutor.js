@@ -162,6 +162,8 @@ document.addEventListener('DOMContentLoaded', () => {
       calendar.render();
   });
 
+  console.log(discount); //temporary
+
   function updateBookedTimesList() {
     allEvents = calendar.getEvents();
     
@@ -206,19 +208,10 @@ document.addEventListener('DOMContentLoaded', () => {
           };
           
           // Format the date according to the options
-          var formattedTime = date.toLocaleString('en-AU', options);
+          var formattedTime = date.toUTCString();
           formattedTime = formattedTime.slice(0, -3);
           listItem.textContent = formattedTime;
           timesBookedDiv.appendChild(listItem);
-
-          var formattedTime = date;
-          listItem.textContent = formattedTime;
-          timesBookedDiv.appendChild(listItem);
-
-          var formattedTime = date.toUTCString();
-          listItem.textContent = formattedTime;
-          timesBookedDiv.appendChild(listItem);
-
         }
       })
 
@@ -226,6 +219,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
       var bundle = 1;
       var totalCost = 0;
+      var discountedCost = 0;
 
       if(hours < 5){
         //bundle = 1;
@@ -237,6 +231,14 @@ document.addEventListener('DOMContentLoaded', () => {
         //bundle = 3;
         totalCost = 600 + ((duration/1000/60/60)-10) * 60
       }
+
+      if (discount) {
+        discountedCost = totalCost - 70;
+      }
+
+      if (discountedCost < 0){
+        discountedCost = 0;
+      }
       
 
       let hoursMessage = document.createElement('p');
@@ -244,7 +246,11 @@ document.addEventListener('DOMContentLoaded', () => {
       timesBookedDiv.appendChild(hoursMessage);
 
       let costMessage = document.createElement('h2');
-      costMessage.textContent = "Total Cost: $" + totalCost;
+      if (discount) {
+        costMessage.textContent = "Total Cost: $" + discountedCost + " (discounted from $" + totalCost + ")";
+      } else {
+        costMessage.textContent = "Total Cost: $" + totalCost;
+      }
       costDiv.appendChild(costMessage);
 
       /*let priceCardId = "#hr-" + bundle;
