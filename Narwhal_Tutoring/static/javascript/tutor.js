@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', () => {
       selectOverlap: function(event) {
         return event.display === 'background';
       },
-      longPressDelay: 100,
+      longPressDelay: 10,
   });
 
   function eventAllow(dropInfo, draggedEvent) {
@@ -232,7 +232,7 @@ document.addEventListener('DOMContentLoaded', () => {
         totalCost = 600 + ((duration/1000/60/60)-10) * 60
       }
 
-      if (discount) {
+      if (discount=="True") {
         discountedCost = totalCost - 70;
       }
 
@@ -246,7 +246,7 @@ document.addEventListener('DOMContentLoaded', () => {
       timesBookedDiv.appendChild(hoursMessage);
 
       let costMessage = document.createElement('h2');
-      if (discount) {
+      if (discount=="True") {
         costMessage.textContent = "Total Cost: $" + discountedCost + " (discounted from $" + totalCost + ")";
       } else {
         costMessage.textContent = "Total Cost: $" + totalCost;
@@ -256,7 +256,11 @@ document.addEventListener('DOMContentLoaded', () => {
       /*let priceCardId = "#hr-" + bundle;
       let priceCard = document.querySelector(priceCardId);
       priceCard.style.backgroundColor = 'lightblue'; //*/
-      var checkoutButton = document.querySelector('#checkout-button');
+      var checkoutButton = document.querySelector('#pay-now-button');
+      checkoutButton.style.display = 'block';  // Set the display property to 'block' or 'inline' as needed
+      checkoutButton.disabled = false;  // Enable the button
+
+      var checkoutButton = document.querySelector('#pay-later-button');
       checkoutButton.style.display = 'block';  // Set the display property to 'block' or 'inline' as needed
       checkoutButton.disabled = false;  // Enable the button
     } else {
@@ -267,7 +271,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   }
 
-  var form = document.getElementById('checkout-form');
+  var form = document.getElementById('pay-now-form');
   form.addEventListener('submit', function (event) {
       event.preventDefault();
 
@@ -288,7 +292,7 @@ document.addEventListener('DOMContentLoaded', () => {
       .then(response => response.json())
       .then(data => {
           console.log(data.message);
-          form.action = `${checkOutUrl}`
+          form.action = `${payNowUrl}`
 
           // Submit the form
           form.submit();
@@ -298,6 +302,36 @@ document.addEventListener('DOMContentLoaded', () => {
       });
   });
 
+  var form = document.getElementById('pay-later-form');
+  form.addEventListener('submit', function (event) {
+      event.preventDefault();
+
+      const cart = calendar.getEvents();
+      console.log(cart)
+
+      fetch('/save-lessons-to-cart/', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-CSRFToken': csrfToken,
+          },
+          body: JSON.stringify({ 
+            'lessons_data': cart,
+            'tutorId': tutorId, 
+          }),
+      })
+      .then(response => response.json())
+      .then(data => {
+          console.log(data.message);
+          form.action = `${payLaterUrl}`
+
+          // Submit the form
+          form.submit();
+      })
+      .catch(error => {
+          console.error('Error:', error);
+      });
+  });
 });
 
 function capitalizeFirstLetter(string) {

@@ -32,6 +32,8 @@
                     <a class="list-group-item list-group-item-action" id="list-calendar-list" data-toggle="list" href="#list-calendar" role="tab" aria-controls="calendar">Calendar</a>
                     {% if user.details.all.0.tutor or user.username == "admin" %}
                         <a class="list-group-item list-group-item-action" id="list-payslips-list" data-toggle="list" href="#list-payslips" role="tab" aria-controls="payslips">Payslips</a>
+                    {% else %}
+                        <a class="list-group-item list-group-item-action" id="list-my-finances-list" data-toggle="list" href="#list-my-finances" role="tab" aria-controls="my-finances">My Finances</a>
                     {% endif %}
                 </div>
             </div>
@@ -70,7 +72,7 @@
                         <div class="mb-3">
                             <label for="mobile" class="form-label">Mobile</label>
                             <input type="tel" class="form-control" id="mobile" name="mobile" pattern="[0-9]{10}" placeholder="e.g., 0455555555" value="{{ user.details.all.0.mobile }}" required>
-                            <small class="form-text text-muted">Please enter your mobile number (10 digits).</small>
+                            <small class="form-text text-muted">Please enter your mobile number (10 digits, Australian).</small>
                         </div>
 
                         {% if user.details.all.0.tutor %}
@@ -187,6 +189,17 @@
                                 </div>
                             {% endfor %}
                         {% endif %}
+                    </div>
+                {% else %}
+                    <div class="tab-pane fade" id="list-my-finances" role="tabpanel" aria-labelledby="list-my-finances-list">
+                        <h3>My Finances</h3>
+                        <button>Pay for everything</button>
+                        <button>Pay for what's due</button>
+                        {% for lesson in processed_lessons %}
+                            <!-- In chronological order
+                                Tutor, Lesson Time, Duration, Cost, Status (paid/due/upcoming)
+                            -->
+                        {% endfor %}
                     </div>
                 {% endif %}
                 <div class="tab-pane fade" id="list-calendar" role="tabpanel" aria-labelledby="list-calendar-list">

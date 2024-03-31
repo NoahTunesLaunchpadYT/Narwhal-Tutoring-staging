@@ -23,89 +23,68 @@
     <section class="contacts">
         <div class="calendar-container">
             <h3>Drag click on the green areas to select lesson times.</h3>
-            {% if user.is_authenticated %}
-            {% else %}
-                <h4>You are not currently logged in.
-                    <a href="{% url 'login' %}?next={{ request.path }}">Log In</a>
-                    or
-                    <a href="{% url 'register' %}?next={{ request.path }}">Register</a>
-                    to book your lesson.
-                </h4>
-                    
-            {% endif %}
 
             {% if tutor.details.all.0.available %}
                 <div class='calendar' id='calendar'></div>
                 <div class="booking-info">
-                    {% if user.is_authenticated %}
-                        <div id="cost-button-div">
-                            <form id="checkout-form" method="POST">
-                                {% csrf_token %}
-                                <button type="submit" id="checkout-button" class="btn btn-primary">Checkout</button>
-                            </form>
-                            <div id="cost-div"></div>
+                    <div id="cost-button-div">
+                        <form id="pay-now-form" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" id="pay-now-button" class="btn btn-secondary">Confirm & Pay Now</button>
+                        </form>
+                        <form id="pay-later-form" method="POST">
+                            {% csrf_token %}
+                            <button type="submit" id="pay-later-button" class="btn btn-primary">Confirm</button>
+                        </form>
+                        <div id="cost-div"></div>
+                    </div>
+                    <div>
+                        <div id="times-booked">
+                            You have not selected a time yet. <b>Click and drag on a green area to select a time. </b>
                         </div>
-                        <div>
-                            <div id="times-booked">
-                                You have not selected a time yet. <b>Click and drag on a green area to select a time. </b>
+                        <ul>
+                            <li>After booking you will have access to {{ tutor }}'s number.</li>
+                            <li>If either party can not make the lesson, a make up lesson will be schedualed.</li>
+                            <li>Bookings made less than a week in advance fall under our <a href="{% url 'tos' %}"></a>late booking policy</a>.</li>
+                            <li>Please read our <a href="{% url 'tos' %}">terms of service</a> for more info.</li>
+                        </ul>
+                        <p>Have any questions? We're always happy to provide answers at 0421286031.</p>
+                        {% if discount %}
+                            <div class="alert alert-success" role="alert">
+                                Discount: $70
                             </div>
-                            <ul>
-                                <li>After booking you will have access to {{ tutor }}'s number.</li>
-                                <li>If either party can not make the lesson, a make up lesson will be schedualed.</li>
-                                <li>Bookings made less than a week in advance fall under our <a href="{% url 'tos' %}"></a>late booking policy</a>.</li>
-                                <li>Please read our <a href="{% url 'tos' %}">terms of service</a> for more info.</li>
-                            </ul>
-                            <p>Have any questions? We're always happy to provide answers at 0421286031.</p>
-                            {% if discount %}
-                                <div class="alert alert-success" role="alert">
-                                    Discount: $70
-                                </div>
-                            {% endif %}
-                            <br>
-                        </div>
-                    {% else %}
-                        <div>
-                            <h4>You are not currently logged in.
-                                <a href="{% url 'login' %}?next={{ request.path }}">Log In</a>
-                                or
-                                <a href="{% url 'register' %}?next={{ request.path }}">Register</a>
-                                to book your lesson.
-                            </h4>
-                        </div>
-                    {% endif %}
+                        {% endif %}
+                        <br>
+                    </div>
                     <div>
                         <h4>Pricing Structure: </h4>
-                        <div id="pricing-info">
-                            <div class="price-tag" id="hr-1">
-                                <h5>
-                                    Single Lesson
-                                </h5>
-                                <p>
-                                    Regular Rate: $70/hr
-                                </p>
-                            </div>
-                            <div class="price-tag" id="hr-2">
-                                <h5>
-                                    5-Hours Package
-                                </h5>
-                                <p>
-                                    Discount: 10%<br>
-                                    Price per Hour: $63/hr<br>
-                                    Total Package: $315
-                                </p>
-                            </div>
-                            <div class="price-tag" id="hr-3">
-                                <h5>
-                                    10-Hours Package
-                                </h5>
-                                <p>
-                                    Discount: 15%<br>
-                                    Price per Hour: $60/hr<br>
-                                    Total Package: $600
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                        <table id="pricing-table">
+                            <tr>
+                                <th>Quantity (Hours)</th>
+                                <th>Discount</th>
+                                <th>Price per Hour</th>
+                                <th>Extended Price</th>
+                            </tr>
+                            <tr class="price-tag" id="hr-1">
+                                <td>Single Lesson</td>
+                                <td>N/A</td>
+                                <td>$70/hr</td>
+                                <td>$70</td>
+                            </tr>
+                            <tr class="price-tag" id="hr-2">
+                                <td>5-Hours Package</td>
+                                <td>10%</td>
+                                <td>$63/hr</td>
+                                <td>$315</td>
+                            </tr>
+                            <tr class="price-tag" id="hr-3">
+                                <td>10-Hours Package</td>
+                                <td>15%</td>
+                                <td>$60/hr</td>
+                                <td>$600</td>
+                            </tr>
+                        </table>
+                    </div>                    
                 </div>
             {% else %}
                 {{ tutor }} is <strong>unavailable</strong>.
@@ -118,9 +97,10 @@
     <script>
         var csrfToken = "{{ csrf_token }}";
         var tutorId = "{{ tutor.id }}";
-        var checkOutUrl = "{% url 'create-checkout-session' %}"
+        var payNowUrl = "{% url 'create-checkout-session' %}";
+        var payLaterUrl = "{% url 'success' %}";
         var username = "{{ user.username }}";
-        var discount = "{{ discount }}"
+        var discount = "{{ discount }}";
     </script>
     <script src="{% static 'javascript/tutor.js' %}"></script>
     <script src="https://polyfill.io/v3/polyfill.min.js?version=3.52.1&features=fetch"></script>

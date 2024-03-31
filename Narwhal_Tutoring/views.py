@@ -16,12 +16,13 @@ import stripe
 from django.views.decorators.csrf import csrf_exempt
 import os
 from twilio.rest import Client
+from django.utils.http import urlencode
 
 stripe.api_key = settings.STRIPE_SECRET_KEY
 
 account_sid = settings.TWILIO_ACCOUNT_SID
 auth_token = settings.TWILIO_AUTH_TOKEN
-client = Client(account_sid, auth_token)
+client = Client('AC115c8c63c76f01ccb086edd2f0f40002', 'cc0a1a6eb07b0a566b4d35115ceae534')
 
 # Create your views here.
 def index(request):
@@ -92,10 +93,6 @@ def register(request):
     if request.method == "POST":
         username = request.POST["username"]
         email = request.POST["email"]
-        student1_name = request.POST.get("student1_name", "")
-        student2_name = request.POST.get("student2_name", "")
-        student3_name = request.POST.get("student3_name", "")
-        address = request.POST["address"]
         mobile = request.POST.get('mobile')
 
         # Ensure password matches confirmation
@@ -117,13 +114,8 @@ def register(request):
             details = User_details(user=user)
 
             # Set additional fields
-            details.student1_name = student1_name
-            details.student2_name = student2_name
-            details.student3_name = student3_name
-            details.address = address
             details.mobile = mobile
 
-            pfp_url = ""
             details.save()
             user.save()
         except IntegrityError:
@@ -132,12 +124,15 @@ def register(request):
             })
         login(request, user)
 
-        message = client.messages.create(
-            from_='+14697323760',
-            body='Somebody has just registered for Narwhal Tutoring',
-            to='+61421286031'
-        )
-        print(message.sid)
+        try:
+            message = client.messages.create(
+                from_='+14697323760',
+                body=f'{username} has just registered for Narwhal Tutoring',
+                to='+61421286031'
+            )
+            print(message.sid)
+        except Exception as e:
+            print(e)
 
         try:
             return redirect(request.GET.get('next', 'index'))
@@ -357,18 +352,6 @@ def tutor(request, tutor_id):
         else:
             discount = True
         
-        check_and_create_details(tutor)
-        if tutor.details.all()[0].tutor == True:
-            details = tutor.details.all()[0]
-            print(tutor)
-            print(tutor.availability.all())
-            print(tutor.availability.all().exists())
-
-
-            #if not tutor.availability.all().exists():
-                #details.available = False
-                #details.save()
-        
         context = {
             "product": product,
             "prices": prices,
@@ -376,33 +359,25 @@ def tutor(request, tutor_id):
             "discount": discount,
         }
 
-        return render(request, "Narwhal_Tutoring/tutor.html", context)
+        check_and_create_details(tutor)
+        if tutor.details.all()[0].tutor == False:
+            return render(request, "Narwhal_Tutoring/tutor_not_found.html")
+
+        return render(request, "Narwhal_Tutoring/tutor.html", context) 
     except Exception as e:
         messages.error(request, f'{e}', extra_tags='danger')
         return render(request, "Narwhal_Tutoring/tutor.html")
     
 def select_lesson_times(request, tutor_id):
+    if not request.user.is_authenticated:
+        return HttpResponseRedirect(reverse('register'))
+    
     try:
         tutor = User.objects.get(id=tutor_id)
         product = Product.objects.get(name="Test Product")
         prices = Price.objects.filter(product=product)
-
-        if request.user.is_authenticated:
-            discount = not request.user.details.all()[0].claimed_discount
-        else:
-            discount = True
         
-        check_and_create_details(tutor)
-        if tutor.details.all()[0].tutor == True:
-            details = tutor.details.all()[0]
-            print(tutor)
-            print(tutor.availability.all())
-            print(tutor.availability.all().exists())
-
-
-            #if not tutor.availability.all().exists():
-                #details.available = False
-                #details.save()
+        discount = not request.user.details.all()[0].claimed_discount
         
         context = {
             "product": product,
@@ -606,7 +581,7 @@ def create_checkout_session(request):
     user = request.user
     try:
         # Try to get the single cart associated with the user
-        cart_instance = user.carts.get(paid=False)
+        cart_instance = user.carts.get(processed=False)
         # Now, cart_instance holds the single Cart instance
     except Cart.DoesNotExist:
         # Handle the case where no cart is found
@@ -640,6 +615,19 @@ def create_checkout_session(request):
         discounts.append({
             'coupon': 'SGOPKJwB'
         })
+
+    # Setting up success url
+    # Your payment logic here
+    payment_success = True  # Set this based on the success of the payment process
+
+    # Encode the boolean value into a URL parameter
+    params = urlencode({'payment_success': payment_success})
+
+    # Get the success URL with cart_instance.id
+    success_url = reverse('success_view_name', args=[cart_instance.id])
+
+    # Append the URL parameter to the success URL
+    success_url_with_params = success_url + '?' + params
     
     checkout_session = stripe.checkout.Session.create(
         payment_method_types=['card'],
@@ -652,7 +640,7 @@ def create_checkout_session(request):
         discounts=discounts,
         #allow_promotion_codes=True,
         mode='payment',
-        success_url=domain + f'/success/{cart_instance.id}',
+        success_url = success_url_with_params,
         cancel_url=domain,
     )
 
@@ -677,17 +665,27 @@ def success(request, cart_id):
 
     if cart.paid:
         print("Error: cart already paid for")
-        message = None
+        message1 = None
     else:
-        cart.paid = True
-        cart.save()
+        payment_success = request.GET.get('payment_success', False)
+        if payment_success:
+            cart.paid = True
+            cart.save()
+            message1 = "Your payment has been successful!"
+        else:
+            message1 = "Your booking has been successful!"
         
         # Creating international phone number
         user = request.user
         mobile = tutor.details.all()[0].mobile
-        international_format = '+61' + mobile[1:]
+        # Check if the mobile number is already in international format
+        if mobile.startswith('+61'):
+            tutor_international_format = mobile
+        else:
+            tutor_international_format = '+61' + mobile[1:]  # Assuming the mobile number is in a format like 0412345678, needs improvement later
 
-        print(international_format)
+        print(tutor_international_format)
+
 
         # Creating the message
         details = user.details.all()[0]
@@ -697,15 +695,33 @@ def success(request, cart_id):
         lessons_info = "\n".join([f"{lesson.start_time.strftime('%Y-%m-%d')}: {lesson.start_time.strftime('%H:%M')} - {lesson.end_time.strftime('%H:%M')}" for lesson in cart.lessons.all()])
         message = f"{user} has booked the following lessons with {tutor}:\n{lessons_info}\n\nUser Details:\nEmail: {user_email}\nMobile: {user_mobile}\nAddress: {user_address}"
         
-        print(message)
+        # Same thing for clients
+        if user_mobile.startswith('+61'):
+            client_international_format = mobile
+        else:
+            client_international_format = '+61' + mobile[1:]  # Assuming the mobile number is in a format like 0412345678, needs improvement later
 
-        message = client.messages.create(
-            from_='+14697323760',
-            body=message,
-            to=international_format
-        )
-        
-        message = "Your payment has been successful!"
+        print(client_international_format)
+
+        try:
+            message = client.messages.create(
+                from_='+14697323760',
+                body=message,
+                to=tutor_international_format
+            )
+            print(message)
+        except Exception as e: 
+            print(e)
+
+        try:
+            message = client.messages.create(
+                from_='+14697323760',
+                body=message,
+                to=client_international_format
+            )
+            print(message)
+        except Exception as e: 
+            print(e)
 
         #Noting that a purchase has been made with a discount.
          
@@ -713,11 +729,9 @@ def success(request, cart_id):
         details.claimed_discount = True
         details.save()
 
-
-
     return render(request, 'Narwhal_Tutoring/success.html', {
         "tutor": tutor,
-        "message": message
+        "message": message1,
     })
 
 def cancel(request):
@@ -732,8 +746,8 @@ def save_lessons_to_cart(request):
         tutor = User.objects.get(id=tutor_id)
 
         user = request.user
-        Cart.objects.filter(user=user, paid=False).delete()
-        cart = Cart.objects.create(user=user, paid=False)
+        Cart.objects.filter(user=user, processed=False).delete()
+        cart = Cart.objects.create(user=user, tutor=tutor, processed=True, paid=False)
 
         for lesson_data in lessons_data:
             if lesson_data.get('title') != 'Availability' and lesson_data.get('title') != "Booked":
@@ -745,7 +759,6 @@ def save_lessons_to_cart(request):
                     end_time=lesson_data.get('end'),
                     event_id=lesson_data.get('id', 0)
                 )
-
         lessons = Lesson.objects.filter(tutor=tutor)
         print("Save completed: ")
         print(lessons)

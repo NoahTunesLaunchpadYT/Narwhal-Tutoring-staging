@@ -65,7 +65,18 @@ class Price(models.Model):
     
 class Cart(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
+    tutor = models.ForeignKey(User, on_delete=models.CASCADE, related_name='carts')
     paid = models.BooleanField(default=False)
+    processed = models.BooleanField(default=False)
+
+    def __str__(self):
+        if self.paid:
+            return f"PAID - {self.user} - Tutor: {self.tutor}"
+        elif self.processed:
+            return f"PROCESSED - {self.user} - Tutor: {self.tutor}"
+        else:
+            return f"INACTIVE - {self.user} - Tutor: {self.tutor}"
+
 
 class Lesson(models.Model):
     cart = models.ForeignKey(Cart, on_delete=models.CASCADE, related_name="lessons")
